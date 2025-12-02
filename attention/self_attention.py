@@ -16,16 +16,28 @@ class SelfAttention(nn.Module):
 
     def forward(self,x):
         print("self attention forward")
+        print("input:", x.shape)
+        # batch_size, num_tokens, input dimension 
+        b, num_tokens, d_in = x.shape
+
         keys = self.W_key(x)
         values = self.W_value(x)
         queries = self.W_query(x)
+        print("Q:", queries.shape, "K:", keys.shape, "V:", values.shape)
 
-        attention_scores = queries @ keys.T
+    
+        attention_scores = queries @ keys.transpose(-1, -2)
+        print("attention_scores:", attention_scores.shape)  # (batch_size, num_tokens, num_tokens)
+
         mask = torch.triu(torch.ones_like(attention_scores), diagonal=1)
         attention_scores = attention_scores.masked_fill(mask == 1, -torch.inf)
         attention_weights = torch.softmax(attention_scores/torch.sqrt(torch.tensor(self.d_in)), dim = -1)
+        print("attention_weights:", attention_weights.shape)
+
         attention_weights = self.dropout(attention_weights)
         context_vector = attention_weights @ values
+        print("context:", context_vector.shape)
+    
         return context_vector
         
         
