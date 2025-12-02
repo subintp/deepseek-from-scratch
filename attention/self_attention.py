@@ -20,6 +20,8 @@ class SelfAttention(nn.Module):
         queries = self.W_query(x)
 
         attention_scores = queries @ keys.T
+        mask = torch.triu(torch.ones_like(attention_scores), diagonal=1)
+        attention_scores = attention_scores.masked_fill(mask == 1, -torch.inf)
         attention_weights = torch.softmax(attention_scores/torch.sqrt(torch.tensor(self.d_in)), dim = -1)
         context_vector = attention_weights @ values
         return context_vector
