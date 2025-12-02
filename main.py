@@ -16,7 +16,7 @@ def main():
     d_in = 3
     d_out = 2
 
-    sa_v2 = SelfAttention(d_in, d_out)
+    sa_v2 = SelfAttention(d_in, d_out, .5)
     print(sa_v2(inputs))
 
 
