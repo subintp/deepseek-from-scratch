@@ -1,34 +1,32 @@
 import torch
-from attention import SelfAttention
+from attention import SelfAttention, MultiHeadedAttention
 
 def main():
-    torch.manual_seed(789)
+    torch.manual_seed(123)
 
-    # Sequence of 6 tokens, each with 3 dimensions
+    # Define the tensor with 3 rows and 6 columns
     inputs = torch.tensor([
-      [0.43, 0.15, 0.89],  # Your
-      [0.55, 0.87, 0.66],  # journey
-      [0.57, 0.85, 0.64],  # starts
-      [0.22, 0.58, 0.33],  # with
-      [0.77, 0.25, 0.10],  # one
-      [0.05, 0.80, 0.55],  # step
+        [0.43, 0.15, 0.89, 0.55, 0.87, 0.66], # Row 1
+        [0.57, 0.85, 0.64, 0.22, 0.58, 0.33], # Row 2
+        [0.77, 0.25, 0.10, 0.05, 0.80, 0.55]  # Row 3
     ])
 
-    # Add batch dimension → shape becomes (1, 6, 3)
-    inputs = inputs.unsqueeze(0)
-    print("Input shape:", inputs.shape)
+    batch = torch.stack((inputs, inputs), dim=0)
+    print("Batch shape:", batch.shape)
 
-    d_in = 3
-    d_out = 2
+    batch_size, num_tokens, d_in = batch.shape
+    d_out = 6
+    num_heads = 2
 
-    # Instantiate self-attention module
-    sa = SelfAttention(d_in, d_out, dropout=0.0)   # disable dropout for testing
+    # Instantiate multi-headed attention module
+    mha = MultiHeadedAttention(d_in, d_out, dropout=0.0, num_heads=num_heads)
 
     # Run the forward pass
-    output = sa(inputs)
+    context_vecs = mha(batch)
 
-    print("\nOutput shape:", output.shape)
-    print("\nOutput tensor:\n", output)
+    # Print the output
+    print("\nOutput shape:", context_vecs.shape)
+    print("\nOutput tensor:\n", context_vecs)
 
 
 if __name__ == "__main__":
